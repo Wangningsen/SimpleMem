@@ -28,10 +28,32 @@ OPENAI_BASE_URL = None
 # Examples: "gpt-4.1-mini", "gpt-4.1", "qwen3-max", "qwen-plus-2025-07-28"
 LLM_MODEL = "gpt-4.1-mini"
 
-# Embedding model (local, no API needed)
+
+# ============================================================================
+# Embedding Configuration
+# ============================================================================
+
+# Embedding backend:
+# - "local": local SentenceTransformer/Qwen embedding model (default behavior)
+# - "api": OpenAI-compatible embedding API
+EMBEDDING_BACKEND = "local"
+
+# Embedding model name
+# - local examples: "Qwen/Qwen3-Embedding-0.6B", "sentence-transformers/all-MiniLM-L6-v2"
+# - api examples: "text-embedding-3-small", "text-embedding-v4" (for compatible endpoints)
 EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B"
-EMBEDDING_DIMENSION = 1024  # For Qwen3: up to 1024, supports 32-1024
-EMBEDDING_CONTEXT_LENGTH = 32768  # Qwen3 supports 32k context
+
+# Embedding dimension MUST match the actual model output dimension
+EMBEDDING_DIMENSION = 1024
+EMBEDDING_CONTEXT_LENGTH = 32768  # Optional reference field for local models
+
+# API embedding backend settings (used when EMBEDDING_BACKEND="api")
+# Environment variables with same names are also supported:
+#   EMBEDDING_API_KEY, EMBEDDING_API_BASE, EMBEDDING_MODEL, EMBEDDING_DIMENSION
+EMBEDDING_API_KEY = None
+EMBEDDING_API_BASE = None
+EMBEDDING_API_BATCH_SIZE = 64
+EMBEDDING_API_TIMEOUT = 60
 
 
 # ============================================================================
@@ -50,6 +72,21 @@ USE_STREAMING = True
 # Adds response_format={"type": "json_object"} to API calls
 # Helps prevent parsing failures from extra text like ```json
 USE_JSON_FORMAT = False
+
+
+# ============================================================================
+# Benchmark Configuration
+# ============================================================================
+
+# Benchmark selection for the unified runner (test_benchmark.py)
+# Supported values: "locomo", "longhealthmem"
+BENCHMARK = "locomo"
+
+# LongHealthMem-specific pseudo-turn chunking configuration
+# Long patient documents are split by character count into sequential user-only turns.
+LONGHEALTHMEM_CHUNK_SIZE = 2000
+LONGHEALTHMEM_CHUNK_OVERLAP = 200
+LONGHEALTHMEM_USER_SPEAKER = "patient"
 
 
 # ============================================================================
@@ -88,7 +125,6 @@ LANCEDB_PATH = "./lancedb_data"
 MEMORY_TABLE_NAME = "memory_entries"
 
 
-
 # ============================================================================
 # Parallel Processing Configuration
 # ============================================================================
@@ -97,7 +133,7 @@ MEMORY_TABLE_NAME = "memory_entries"
 ENABLE_PARALLEL_PROCESSING = True
 MAX_PARALLEL_WORKERS = 16  # Number of parallel workers for memory building
 
-# Retrieval Parallel Processing  
+# Retrieval Parallel Processing
 ENABLE_PARALLEL_RETRIEVAL = True
 MAX_RETRIEVAL_WORKERS = 8  # Number of parallel workers for retrieval queries
 
@@ -108,7 +144,7 @@ MAX_REFLECTION_ROUNDS = 2
 
 
 # ============================================================================
-# LLM-as-Judge Configuration (not used yet)
+# LLM-as-Judge Configuration (LoCoMo only)
 # ============================================================================
 
 # Judge LLM API Key (optional - if None, uses OPENAI_API_KEY)
@@ -124,7 +160,7 @@ JUDGE_MODEL = "gpt-4.1-mini"
 # Judge specific settings
 JUDGE_ENABLE_THINKING = False  # Usually false for evaluation tasks
 JUDGE_USE_STREAMING = False    # Usually false for evaluation
-JUDGE_TEMPERATURE = 0.3        
+JUDGE_TEMPERATURE = 0.3
 
 # Example configurations:
 # 1. Use cheaper model for judge evaluation:
@@ -138,4 +174,3 @@ JUDGE_TEMPERATURE = 0.3
 # 3. Use Qwen for judge (if available):
 #    JUDGE_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 #    JUDGE_MODEL = "qwen-plus-2025-09-11"
-

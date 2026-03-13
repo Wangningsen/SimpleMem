@@ -74,22 +74,22 @@
 
 <br/>
 
-[🇨🇳 中文](./docs/i18n/README.zh-CN.md) •
-[🇯🇵 日本語](./docs/i18n/README.ja.md) •
-[🇰🇷 한국어](./docs/i18n/README.ko.md) •
-[🇪🇸 Español](./docs/i18n/README.es.md) •
-[🇫🇷 Français](./docs/i18n/README.fr.md) •
-[🇩🇪 Deutsch](./docs/i18n/README.de.md) •
-[🇧🇷 Português](./docs/i18n/README.pt-br.md)<br/>
-[🇷🇺 Русский](./docs/i18n/README.ru.md) •
-[🇸🇦 العربية](./docs/i18n/README.ar.md) •
-[🇮🇹 Italiano](./docs/i18n/README.it.md) •
-[🇻🇳 Tiếng Việt](./docs/i18n/README.vi.md) •
-[🇹🇷 Türkçe](./docs/i18n/README.tr.md)
+[馃嚚馃嚦 涓枃](./docs/i18n/README.zh-CN.md) 鈥?
+[馃嚡馃嚨 鏃ユ湰瑾瀅(./docs/i18n/README.ja.md) 鈥?
+[馃嚢馃嚪 頃滉淡鞏碷(./docs/i18n/README.ko.md) 鈥?
+[馃嚜馃嚫 Espa帽ol](./docs/i18n/README.es.md) 鈥?
+[馃嚝馃嚪 Fran莽ais](./docs/i18n/README.fr.md) 鈥?
+[馃嚛馃嚜 Deutsch](./docs/i18n/README.de.md) 鈥?
+[馃嚙馃嚪 Portugu锚s](./docs/i18n/README.pt-br.md)<br/>
+[馃嚪馃嚭 袪褍褋褋泻懈泄](./docs/i18n/README.ru.md) 鈥?
+[馃嚫馃嚘 丕賱毓乇亘賷丞](./docs/i18n/README.ar.md) 鈥?
+[馃嚠馃嚬 Italiano](./docs/i18n/README.it.md) 鈥?
+[馃嚮馃嚦 Ti岷縩g Vi峄噒](./docs/i18n/README.vi.md) 鈥?
+[馃嚬馃嚪 T眉rk莽e](./docs/i18n/README.tr.md)
 
 <br/>
 
-[![Project Page](https://img.shields.io/badge/🎬_INTERACTIVE_DEMO-Visit_Our_Website-FF6B6B?style=for-the-badge&labelColor=FF6B6B&color=4ECDC4&logoColor=white)](https://aiming-lab.github.io/SimpleMem-Page)
+[![Project Page](https://img.shields.io/badge/馃幀_INTERACTIVE_DEMO-Visit_Our_Website-FF6B6B?style=for-the-badge&labelColor=FF6B6B&color=4ECDC4&logoColor=white)](https://aiming-lab.github.io/SimpleMem-Page)
 
 <p align="center">
   <a href="https://arxiv.org/abs/2601.02553"><img src="https://img.shields.io/badge/arXiv-2601.02553-b31b1b?style=flat&labelColor=555" alt="arXiv"></a>
@@ -108,7 +108,7 @@
 
 <br/>
 
-[Overview](#-overview) • [Quick Start](#-quick-start) • [Docker](#-run-with-docker) • [Cross-Session Memory](#-cross-session-memory) • [MCP Server](#-mcp-server) • [Evaluation](#-evaluation) • [Citation](#-citation)
+[Overview](#-overview) 鈥?[Quick Start](#-quick-start) 鈥?[Docker](#-run-with-docker) 鈥?[Cross-Session Memory](#-cross-session-memory) 鈥?[MCP Server](#-mcp-server) 鈥?[Evaluation](#-evaluation) 鈥?[Citation](#-citation)
 
 </div>
 
@@ -116,36 +116,36 @@
 
 <br/>
 
-## 🔥 News
+## 馃敟 News
 
-- **[02/09/2026]** 🚀 **Cross-Session Memory is Here — Outperforming Claude-Mem by 64%!** SimpleMem now supports **persistent memory across conversations**. On the LoCoMo benchmark, SimpleMem achieves a **64% performance boost** over Claude-Mem. Your agents can now recall context, decisions, and learnings from previous sessions automatically. [View Cross-Session Documentation →](cross/README.md)
-- **[01/20/2026]** **SimpleMem is now available on PyPI!** 📦 Install directly via `pip install simplemem`. [View Package Usage Guide →](docs/PACKAGE_USAGE.md)
-- **[01/19/2026]** **Added Local Memory Storage for SimpleMem Skill!** 💾 SimpleMem Skill now supports local memory storage within Claude Skills.
-- **[01/18/2026]** **SimpleMem now supports Claude Skills!** 🚀 Use SimpleMem in claude.ai for long-term memory across conversations. Register at [mcp.simplemem.cloud](https://mcp.simplemem.cloud), configure your token, and import the skill!
-- **[01/14/2026]** **SimpleMem MCP Server is now LIVE and Open Source!** 🎉 Cloud-hosted memory service at [mcp.simplemem.cloud](https://mcp.simplemem.cloud). Integrates with LM Studio, Cherry Studio, Cursor, Claude Desktop via **Streamable HTTP** MCP protocol. [View MCP Documentation →](MCP/README.md)
-- **[01/08/2026]** 🔥 Join our [Discord](https://discord.gg/KA2zC32M) and [WeChat Group](fig/wechat_logo3.JPG) to collaborate and exchange ideas!
+- **[02/09/2026]** 馃殌 **Cross-Session Memory is Here 鈥?Outperforming Claude-Mem by 64%!** SimpleMem now supports **persistent memory across conversations**. On the LoCoMo benchmark, SimpleMem achieves a **64% performance boost** over Claude-Mem. Your agents can now recall context, decisions, and learnings from previous sessions automatically. [View Cross-Session Documentation 鈫抅(cross/README.md)
+- **[01/20/2026]** **SimpleMem is now available on PyPI!** 馃摝 Install directly via `pip install simplemem`. [View Package Usage Guide 鈫抅(docs/PACKAGE_USAGE.md)
+- **[01/19/2026]** **Added Local Memory Storage for SimpleMem Skill!** 馃捑 SimpleMem Skill now supports local memory storage within Claude Skills.
+- **[01/18/2026]** **SimpleMem now supports Claude Skills!** 馃殌 Use SimpleMem in claude.ai for long-term memory across conversations. Register at [mcp.simplemem.cloud](https://mcp.simplemem.cloud), configure your token, and import the skill!
+- **[01/14/2026]** **SimpleMem MCP Server is now LIVE and Open Source!** 馃帀 Cloud-hosted memory service at [mcp.simplemem.cloud](https://mcp.simplemem.cloud). Integrates with LM Studio, Cherry Studio, Cursor, Claude Desktop via **Streamable HTTP** MCP protocol. [View MCP Documentation 鈫抅(MCP/README.md)
+- **[01/08/2026]** 馃敟 Join our [Discord](https://discord.gg/KA2zC32M) and [WeChat Group](fig/wechat_logo3.JPG) to collaborate and exchange ideas!
 - **[01/05/2026]** SimpleMem paper was released on [arXiv](https://arxiv.org/abs/2601.02553)!
 
 ---
 
-## 📑 Table of Contents
+## 馃搼 Table of Contents
 
-- [🌟 Overview](#-overview)
-- [🎯 Key Contributions](#-key-contributions)
-- [🚀 Performance Highlights](#-performance-highlights)
-- [📦 Installation](#-installation)
-- [🐳 Run with Docker](#-run-with-docker)
-- [⚡ Quick Start](#-quick-start)
-- [🧠 Cross-Session Memory](#-cross-session-memory)
-- [🔌 MCP Server](#-mcp-server)
-- [📊 Evaluation](#-evaluation)
-- [📝 Citation](#-citation)
-- [📄 License](#-license)
-- [🙏 Acknowledgments](#-acknowledgments)
+- [馃専 Overview](#-overview)
+- [馃幆 Key Contributions](#-key-contributions)
+- [馃殌 Performance Highlights](#-performance-highlights)
+- [馃摝 Installation](#-installation)
+- [馃惓 Run with Docker](#-run-with-docker)
+- [鈿?Quick Start](#-quick-start)
+- [馃 Cross-Session Memory](#-cross-session-memory)
+- [馃攲 MCP Server](#-mcp-server)
+- [馃搳 Evaluation](#-evaluation)
+- [馃摑 Citation](#-citation)
+- [馃搫 License](#-license)
+- [馃檹 Acknowledgments](#-acknowledgments)
 
 ---
 
-## 🌟 Overview
+## 馃専 Overview
 
 <div align="center">
 <img src="fig/Fig_tradeoff.png" alt="Performance vs Efficiency Trade-off" width="900"/>
@@ -159,7 +159,7 @@
 <tr>
 <td width="33%" align="center">
 
-### 🔍 Stage 1
+### 馃攳 Stage 1
 **Semantic Structured Compression**
 
 Distills unstructured interactions into compact, multi-view indexed memory units
@@ -167,7 +167,7 @@ Distills unstructured interactions into compact, multi-view indexed memory units
 </td>
 <td width="33%" align="center">
 
-### 🗂️ Stage 2
+### 馃梻锔?Stage 2
 **Online Semantic Synthesis**
 
 Intra-session process that instantly integrates related context into unified abstract representations to eliminate redundancy
@@ -175,7 +175,7 @@ Intra-session process that instantly integrates related context into unified abs
 </td>
 <td width="33%" align="center">
 
-### 🎯 Stage 3
+### 馃幆 Stage 3
 **Intent-Aware Retrieval Planning**
 
 Infers search intent to dynamically determine retrieval scope and construct precise context efficiently
@@ -192,7 +192,7 @@ Infers search intent to dynamically determine retrieval scope and construct prec
 
 ---
 
-### 🏆 Performance Comparison
+### 馃弳 Performance Comparison
 
 <div align="center">
 
@@ -208,31 +208,31 @@ Infers search intent to dynamically determine retrieval scope and construct prec
 
 **LoCoMo-10 Benchmark Results (GPT-4.1-mini)**
 
-| Model | ⏱️ Construction Time | 🔎 Retrieval Time | ⚡ Total Time | 🎯 Average F1 |
+| Model | 鈴憋笍 Construction Time | 馃攷 Retrieval Time | 鈿?Total Time | 馃幆 Average F1 |
 |:------|:--------------------:|:-----------------:|:-------------:|:-------------:|
 | A-Mem | 5140.5s | 796.7s | 5937.2s | 32.58% |
 | LightMem | 97.8s | 577.1s | 675.9s | 24.63% |
 | Mem0 | 1350.9s | 583.4s | 1934.3s | 34.20% |
-| **SimpleMem** ⭐ | **92.6s** | **388.3s** | **480.9s** | **43.24%** |
+| **SimpleMem** 猸?| **92.6s** | **388.3s** | **480.9s** | **43.24%** |
 
 </div>
 
-> **💡 Key Advantages:**
-> - 🏆 **Highest F1 Score**: 43.24% (+26.4% vs. Mem0, +75.6% vs. LightMem)
-> - ⚡ **Fastest Retrieval**: 388.3s (32.7% faster than LightMem, 51.3% faster than Mem0)
-> - 🚀 **Fastest End-to-End**: 480.9s total processing time (12.5× faster than A-Mem)
+> **馃挕 Key Advantages:**
+> - 馃弳 **Highest F1 Score**: 43.24% (+26.4% vs. Mem0, +75.6% vs. LightMem)
+> - 鈿?**Fastest Retrieval**: 388.3s (32.7% faster than LightMem, 51.3% faster than Mem0)
+> - 馃殌 **Fastest End-to-End**: 480.9s total processing time (12.5脳 faster than A-Mem)
 
 ---
 
-## 🎯 Key Contributions
+## 馃幆 Key Contributions
 
-### 1️⃣ Semantic Structured Compression
+### 1锔忊儯 Semantic Structured Compression
 
-SimpleMem applies an **implicit semantic density gating** mechanism integrated into the LLM generation process to filter redundant interaction content. The system reformulates raw dialogue streams into **compact memory units** — self-contained facts with resolved coreferences and absolute timestamps. Each unit is indexed through three complementary representations for flexible retrieval:
+SimpleMem applies an **implicit semantic density gating** mechanism integrated into the LLM generation process to filter redundant interaction content. The system reformulates raw dialogue streams into **compact memory units** 鈥?self-contained facts with resolved coreferences and absolute timestamps. Each unit is indexed through three complementary representations for flexible retrieval:
 
 <div align="center">
 
-| 🔍 Layer | 📊 Type | 🎯 Purpose | 🛠️ Implementation |
+| 馃攳 Layer | 馃搳 Type | 馃幆 Purpose | 馃洜锔?Implementation |
 |---------|---------|------------|-------------------|
 | **Semantic** | Dense | Conceptual similarity | Vector embeddings (1024-d) |
 | **Lexical** | Sparse | Exact term matching | BM25-style keyword index |
@@ -240,19 +240,19 @@ SimpleMem applies an **implicit semantic density gating** mechanism integrated i
 
 </div>
 
-**✨ Example Transformation:**
+**鉁?Example Transformation:**
 ```diff
-- Input:  "He'll meet Bob tomorrow at 2pm"  [❌ relative, ambiguous]
-+ Output: "Alice will meet Bob at Starbucks on 2025-11-16T14:00:00"  [✅ absolute, atomic]
+- Input:  "He'll meet Bob tomorrow at 2pm"  [鉂?relative, ambiguous]
++ Output: "Alice will meet Bob at Starbucks on 2025-11-16T14:00:00"  [鉁?absolute, atomic]
 ```
 
 ---
 
-### 2️⃣ Online Semantic Synthesis
+### 2锔忊儯 Online Semantic Synthesis
 
 Unlike traditional systems that rely on asynchronous background maintenance, SimpleMem performs synthesis **on-the-fly during the write phase**. Related memory units are synthesized into higher-level abstract representations within the current session scope, allowing repetitive or structurally similar experiences to be **denoised and compressed immediately**.
 
-**✨ Example Synthesis:**
+**鉁?Example Synthesis:**
 ```diff
 - Fragment 1: "User wants coffee"
 - Fragment 2: "User prefers oat milk"
@@ -264,7 +264,7 @@ This proactive synthesis ensures the memory topology remains compact and free of
 
 ---
 
-### 3️⃣ Intent-Aware Retrieval Planning
+### 3锔忊儯 Intent-Aware Retrieval Planning
 
 Instead of fixed-depth retrieval, SimpleMem leverages the reasoning capabilities of the LLM to generate a **comprehensive retrieval plan**. Given a query, the planning module infers **latent search intent** to dynamically determine retrieval scope and depth:
 
@@ -276,7 +276,7 @@ The system then executes **parallel multi-view retrieval** across semantic, lexi
 <tr>
 <td width="50%">
 
-**🔹 Simple Queries**
+**馃敼 Simple Queries**
 - Direct fact lookup via single memory unit
 - Minimal retrieval depth
 - Fast response time
@@ -284,7 +284,7 @@ The system then executes **parallel multi-view retrieval** across semantic, lexi
 </td>
 <td width="50%">
 
-**🔸 Complex Queries**
+**馃敻 Complex Queries**
 - Aggregation across multiple events
 - Expanded retrieval depth
 - Comprehensive coverage
@@ -293,26 +293,26 @@ The system then executes **parallel multi-view retrieval** across semantic, lexi
 </tr>
 </table>
 
-**📈 Result**: 43.24% F1 score with **30× fewer tokens** than full-context methods.
+**馃搱 Result**: 43.24% F1 score with **30脳 fewer tokens** than full-context methods.
 
 ---
 
-## 🚀 Performance Highlights
+## 馃殌 Performance Highlights
 
-### 📊 Benchmark Results (LoCoMo)
+### 馃搳 Benchmark Results (LoCoMo)
 
 <details open>
-<summary><b>🏆 Cross-Session Memory Comparison</b></summary>
+<summary><b>馃弳 Cross-Session Memory Comparison</b></summary>
 
 | System | LoCoMo Score | vs SimpleMem |
 |:-------|:------------:|:------------:|
-| **SimpleMem** | **48** | — |
+| **SimpleMem** | **48** | 鈥?|
 | Claude-Mem | 29.3 | **+64%** |
 
 </details>
 
 <details>
-<summary><b>🔬 High-Capability Models (GPT-4.1-mini)</b></summary>
+<summary><b>馃敩 High-Capability Models (GPT-4.1-mini)</b></summary>
 
 | Task Type | SimpleMem F1 | Mem0 F1 | Improvement |
 |:----------|:------------:|:-------:|:-----------:|
@@ -323,46 +323,46 @@ The system then executes **parallel multi-view retrieval** across semantic, lexi
 </details>
 
 <details>
-<summary><b>⚙️ Efficient Models (Qwen2.5-1.5B)</b></summary>
+<summary><b>鈿欙笍 Efficient Models (Qwen2.5-1.5B)</b></summary>
 
 | Metric | SimpleMem | Mem0 | Notes |
 |:-------|:---------:|:----:|:------|
-| **Average F1** | 25.23% | 23.77% | Competitive with 99× smaller model |
+| **Average F1** | 25.23% | 23.77% | Competitive with 99脳 smaller model |
 
 </details>
 
 ---
 
-## 📦 Installation
+## 馃摝 Installation
 
-### 📝 Notes for First-Time Users
+### 馃摑 Notes for First-Time Users
 
 - Ensure you are using **Python 3.10 in your active environment**, not just installed globally.
 - An OpenAI-compatible API key must be configured **before running any memory construction or retrieval**, otherwise initialization may fail.
 - When using non-OpenAI providers (e.g., Qwen or Azure OpenAI), verify both the model name and `OPENAI_BASE_URL` in `config.py`.
 - For large dialogue datasets, enabling parallel processing can significantly reduce memory construction time.
 
-### 📋 Requirements
+### 馃搵 Requirements
 
-- 🐍 Python 3.10
-- 🔑 OpenAI-compatible API (OpenAI, Qwen, Azure OpenAI, etc.)
+- 馃悕 Python 3.10
+- 馃攽 OpenAI-compatible API (OpenAI, Qwen, Azure OpenAI, etc.)
 
-### 🛠️ Setup
+### 馃洜锔?Setup
 
 ```bash
-# 📥 Clone repository
+# 馃摜 Clone repository
 git clone https://github.com/aiming-lab/SimpleMem.git
 cd SimpleMem
 
-# 📦 Install dependencies
+# 馃摝 Install dependencies
 pip install -r requirements.txt
 
-# ⚙️ Configure API settings
+# 鈿欙笍 Configure API settings
 cp config.py.example config.py
 # Edit config.py with your API key and preferences
 ```
 
-### ⚙️ Configuration Example
+### 鈿欙笍 Configuration Example
 
 ```python
 # config.py
@@ -375,7 +375,7 @@ EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B"  # State-of-the-art retrieval
 
 ---
 
-## 🐳 Run with Docker
+## 馃惓 Run with Docker
 
 The **MCP Server** can be run in Docker for a consistent, isolated environment. Data (LanceDB and user DB) is persisted in a host volume.
 
@@ -426,38 +426,38 @@ docker compose logs -f simplemem   # Follow logs
 docker compose down                 # Stop and remove containers
 ```
 
-> 📖 For self-hosting the MCP server (Docker or bare metal), see [MCP Documentation](MCP/README.md).
+> 馃摉 For self-hosting the MCP server (Docker or bare metal), see [MCP Documentation](MCP/README.md).
 
 ---
 
-## ⚡ Quick Start
+## 鈿?Quick Start
 
-### 🧠 Understanding the Basic Workflow
+### 馃 Understanding the Basic Workflow
 
 At a high level, SimpleMem works as a long-term memory system for LLM-based agents. The workflow consists of three simple steps:
 
-1. **Store information** – Dialogues or facts are processed and converted into structured, atomic memories.
-2. **Index memory** – Stored memories are organized using semantic embeddings and structured metadata.
-3. **Retrieve relevant memory** – When a query is made, SimpleMem retrieves the most relevant stored information based on meaning rather than keywords.
+1. **Store information** 鈥?Dialogues or facts are processed and converted into structured, atomic memories.
+2. **Index memory** 鈥?Stored memories are organized using semantic embeddings and structured metadata.
+3. **Retrieve relevant memory** 鈥?When a query is made, SimpleMem retrieves the most relevant stored information based on meaning rather than keywords.
 
 This design allows LLM agents to maintain context, recall past information efficiently, and avoid repeatedly processing redundant history.
 
-### 🎓 Basic Usage
+### 馃帗 Basic Usage
 
 ```python
 from main import SimpleMemSystem
 
-# 🚀 Initialize system
+# 馃殌 Initialize system
 system = SimpleMemSystem(clear_db=True)
 
-# 💬 Add dialogues (Stage 1: Semantic Structured Compression)
+# 馃挰 Add dialogues (Stage 1: Semantic Structured Compression)
 system.add_dialogue("Alice", "Bob, let's meet at Starbucks tomorrow at 2pm", "2025-11-15T14:30:00")
 system.add_dialogue("Bob", "Sure, I'll bring the market analysis report", "2025-11-15T14:31:00")
 
-# ✅ Finalize atomic encoding
+# 鉁?Finalize atomic encoding
 system.finalize()
 
-# 🔎 Query with intent-aware retrieval (Stage 3: Intent-Aware Retrieval Planning)
+# 馃攷 Query with intent-aware retrieval (Stage 3: Intent-Aware Retrieval Planning)
 answer = system.ask("When and where will Alice and Bob meet?")
 print(answer)
 # Output: "16 November 2025 at 2:00 PM at Starbucks"
@@ -465,34 +465,34 @@ print(answer)
 
 ---
 
-### 🚄 Advanced: Parallel Processing
+### 馃殑 Advanced: Parallel Processing
 
 For large-scale dialogue processing, enable parallel mode:
 
 ```python
 system = SimpleMemSystem(
     clear_db=True,
-    enable_parallel_processing=True,  # ⚡ Parallel memory building
+    enable_parallel_processing=True,  # 鈿?Parallel memory building
     max_parallel_workers=8,
-    enable_parallel_retrieval=True,   # 🔍 Parallel query execution
+    enable_parallel_retrieval=True,   # 馃攳 Parallel query execution
     max_retrieval_workers=4
 )
 ```
 
-> **💡 Pro Tip**: Parallel processing significantly reduces latency for batch operations!
+> **馃挕 Pro Tip**: Parallel processing significantly reduces latency for batch operations!
 
 ---
 
-## ❓ Common Setup Issues & Troubleshooting
+## 鉂?Common Setup Issues & Troubleshooting
 
 If you encounter issues while setting up or running SimpleMem for the first time, check the following common cases:
 
-### 1️⃣ API Key Not Detected
+### 1锔忊儯 API Key Not Detected
 - Ensure your API key is correctly set in `config.py`
 - For OpenAI-compatible providers (Qwen, Azure, etc.), verify that `OPENAI_BASE_URL` is configured correctly
 - Restart your Python environment after updating the key
 
-### 2️⃣ Python Version Mismatch
+### 2锔忊儯 Python Version Mismatch
 - SimpleMem requires **Python 3.10**
 - Check your version using:
   ```bash
@@ -501,9 +501,9 @@ If you encounter issues while setting up or running SimpleMem for the first time
 
 ---
 
-## 🧠 Cross-Session Memory
+## 馃 Cross-Session Memory
 
-**SimpleMem-Cross** extends SimpleMem with persistent cross-conversation memory capabilities. Agents can recall context, decisions, and observations from previous sessions — enabling continuity across conversations without manual context re-injection.
+**SimpleMem-Cross** extends SimpleMem with persistent cross-conversation memory capabilities. Agents can recall context, decisions, and observations from previous sessions 鈥?enabling continuity across conversations without manual context re-injection.
 
 ### Key Features
 
@@ -524,7 +524,7 @@ from cross.orchestrator import create_orchestrator
 async def main():
     orch = create_orchestrator(project="my-project")
 
-    # Start session — previous context is injected automatically
+    # Start session 鈥?previous context is injected automatically
     result = await orch.start_session(
         content_session_id="session-001",
         user_prompt="Continue building the REST API",
@@ -540,7 +540,7 @@ async def main():
         tool_output="class JWTHandler: ...",
     )
 
-    # Finalize — extracts observations, generates summary, stores memories
+    # Finalize 鈥?extracts observations, generates summary, stores memories
     report = await orch.stop_session(result["memory_session_id"])
     print(f"Stored {report.entries_stored} memory entries")
 
@@ -587,15 +587,15 @@ Session Manager  Context Injector  Consolidation
 | `cross/api_mcp.py` | MCP tool definitions |
 | `cross/consolidation.py` | Memory maintenance worker |
 
-> 📖 For detailed API documentation, see [Cross-Session README](cross/README.md)
+> 馃摉 For detailed API documentation, see [Cross-Session README](cross/README.md)
 
 ---
 
-## 🔌 MCP Server
+## 馃攲 MCP Server
 
 SimpleMem is available as a **cloud-hosted memory service** via the Model Context Protocol (MCP), enabling seamless integration with AI assistants like Claude Desktop, Cursor, and other MCP-compatible clients.
 
-**🌐 Cloud Service**: [mcp.simplemem.cloud](https://mcp.simplemem.cloud) — or self-host the MCP server locally using [Docker](#-run-with-docker).
+**馃寪 Cloud Service**: [mcp.simplemem.cloud](https://mcp.simplemem.cloud) 鈥?or self-host the MCP server locally using [Docker](#-run-with-docker).
 
 ### Key Features
 
@@ -621,37 +621,41 @@ SimpleMem is available as a **cloud-hosted memory service** via the Model Contex
 }
 ```
 
-> 📖 For detailed setup instructions and self-hosting guide, see [MCP Documentation](MCP/README.md)
+> 馃摉 For detailed setup instructions and self-hosting guide, see [MCP Documentation](MCP/README.md)
 
 ---
 
-## 📊 Evaluation
+## 馃搳 Evaluation
 
 ### 🧪 Run Benchmark Tests
 
 ```bash
-# 🎯 Full LoCoMo benchmark
-python test_locomo10.py
+# Unified benchmark runner (LoCoMo)
+python test_benchmark.py --benchmark locomo --dataset test_ref/locomo10.json
 
-# 📉 Subset evaluation (5 samples)
+# Unified benchmark runner (LongHealthMem)
+python test_benchmark.py --benchmark longhealthmem --dataset benchmark_longmemory_v1.json
+
+# Optional: subset + custom output
+python test_benchmark.py --benchmark longhealthmem --num-samples 5 --result-file my_longhealth_results.json
+
+# Legacy LoCoMo script (still supported)
 python test_locomo10.py --num-samples 5
-
-# 💾 Custom output file
-python test_locomo10.py --result-file my_results.json
 ```
 
+See [LongHealthMem guide](docs/LONGHEALTHMEM.md) for schema, chunking, MCQ format, and embedding API setup.
 ---
 
-### 🔬 Reproduce Paper Results
+### 馃敩 Reproduce Paper Results
 
 Use the exact configurations in `config.py`:
-- **🚀 High-capability**: GPT-4.1-mini, Qwen3-Plus
-- **⚙️ Efficient**: Qwen2.5-1.5B, Qwen2.5-3B
-- **🔍 Embedding**: Qwen3-Embedding-0.6B (1024-d)
+- **馃殌 High-capability**: GPT-4.1-mini, Qwen3-Plus
+- **鈿欙笍 Efficient**: Qwen2.5-1.5B, Qwen2.5-3B
+- **馃攳 Embedding**: Qwen3-Embedding-0.6B (1024-d)
 
 ---
 
-## 📝 Citation
+## 馃摑 Citation
 
 If you use SimpleMem in your research, please cite:
 
@@ -667,16 +671,17 @@ If you use SimpleMem in your research, please cite:
 
 ---
 
-## 📄 License
+## 馃搫 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 Acknowledgments
+## 馃檹 Acknowledgments
 
 We would like to thank the following projects and teams:
 
-- 🔍 **Embedding Model**: [Qwen3-Embedding](https://github.com/QwenLM/Qwen) - State-of-the-art retrieval performance
-- 🗄️ **Vector Database**: [LanceDB](https://lancedb.com/) - High-performance columnar storage
-- 📊 **Benchmark**: [LoCoMo](https://github.com/snap-research/locomo) - Long-context memory evaluation framework
+- 馃攳 **Embedding Model**: [Qwen3-Embedding](https://github.com/QwenLM/Qwen) - State-of-the-art retrieval performance
+- 馃梽锔?**Vector Database**: [LanceDB](https://lancedb.com/) - High-performance columnar storage
+- 馃搳 **Benchmark**: [LoCoMo](https://github.com/snap-research/locomo) - Long-context memory evaluation framework
+

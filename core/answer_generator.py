@@ -5,17 +5,19 @@ Section 3.3: Intent-Aware Retrieval Planning
 Generates answers from the merged context C_q after multi-view retrieval
 """
 from typing import List
+
+import config
 from models.memory_entry import MemoryEntry
 from utils.llm_client import LLMClient
-import config
 
 
 class AnswerGenerator:
     """
     Answer Generator - Synthesis from retrieved memory units (Section 3.3)
 
-    Generates answers from C_q = R_sem ∪ R_lex ∪ R_sym
+    Generates answers from C_q = R_sem U R_lex U R_sym
     """
+
     def __init__(self, llm_client: LLMClient):
         self.llm_client = llm_client
 
@@ -43,12 +45,12 @@ class AnswerGenerator:
         messages = [
             {
                 "role": "system",
-                "content": "You are a professional Q&A assistant. Extract concise answers from context. You must output valid JSON format."
+                "content": "You are a professional Q&A assistant. Extract concise answers from context. You must output valid JSON format.",
             },
             {
                 "role": "user",
-                "content": prompt
-            }
+                "content": prompt,
+            },
         ]
 
         # Retry up to 3 times
@@ -57,13 +59,13 @@ class AnswerGenerator:
             try:
                 # Use JSON format if configured
                 response_format = None
-                if hasattr(config, 'USE_JSON_FORMAT') and config.USE_JSON_FORMAT:
+                if hasattr(config, "USE_JSON_FORMAT") and config.USE_JSON_FORMAT:
                     response_format = {"type": "json_object"}
 
                 response = self.llm_client.chat_completion(
                     messages,
                     temperature=0.1,
-                    response_format=response_format
+                    response_format=response_format,
                 )
 
                 # Parse JSON response
@@ -71,20 +73,28 @@ class AnswerGenerator:
                 # Return the answer from JSON
                 return result.get("answer", response.strip())
 
-            except Exception as e:
+            except Exception as exc:
                 if attempt < max_retries - 1:
-                    print(f"Answer generation attempt {attempt + 1}/{max_retries} failed: {e}. Retrying...")
+                    print(
+                        f"Answer generation attempt {attempt + 1}/{max_retries} failed: {exc}. Retrying..."
+                    )
                 else:
-                    print(f"Warning: Failed to parse JSON response after {max_retries} attempts: {e}")
-                    # Fallback to raw response
-                    if 'response' in locals():
+                    print(
+                        f"Warning: Failed to parse JSON response after {max_retries} attempts: {exc}"
+                    )
+                    if "response" in locals():
                         return response.strip()
-                    else:
-                        return "Failed to generate answer"
+                    return "Failed to generate answer"
+
+    def format_contexts(self, contexts: List[MemoryEntry]) -> str:
+        """
+        Public wrapper for context formatting to support benchmark-specific prompts.
+        """
+        return self._format_contexts(contexts)
 
     def _format_contexts(self, contexts: List[MemoryEntry]) -> str:
         """
-        Format contexts to readable text
+        Format contexts to readable text.
         """
         formatted = []
         for i, entry in enumerate(contexts, 1):
@@ -112,7 +122,7 @@ class AnswerGenerator:
 
     def _build_answer_prompt(self, query: str, context_str: str) -> str:
         """
-        Build answer generation prompt
+        Build answer generation prompt.
         """
         return f"""
 Answer the user's question based on the provided context.

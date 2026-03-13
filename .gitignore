@@ -74,7 +74,6 @@ lancedb_data/
 # Test results
 locomo10_test_results.json
 test_results/
-*.json
 
 # Jupyter Notebook
 .ipynb_checkpoints

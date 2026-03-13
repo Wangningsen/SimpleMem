@@ -1,157 +1,326 @@
 """
-Embedding utilities - Generate vector embeddings using SentenceTransformers
-Supports Qwen3 Embedding models through SentenceTransformers interface
+Embedding utilities with pluggable providers.
+
+Supports:
+- Local SentenceTransformers models (existing behavior)
+- API-based OpenAI-compatible embedding endpoints
 """
-from typing import List, Optional, Dict, Any
-import numpy as np
-import config
+from __future__ import annotations
+
 import os
+from abc import ABC, abstractmethod
+from typing import Any, Dict, Iterable, List, Optional
+
+import numpy as np
+
+import config
 
 
-class EmbeddingModel:
+def _safe_int(value: Optional[str]) -> Optional[int]:
+    if value is None:
+        return None
+    value = str(value).strip()
+    if not value:
+        return None
+    try:
+        return int(value)
+    except ValueError:
+        return None
+
+
+def _safe_float(value: Optional[str]) -> Optional[float]:
+    if value is None:
+        return None
+    value = str(value).strip()
+    if not value:
+        return None
+    try:
+        return float(value)
+    except ValueError:
+        return None
+
+
+def _batched(items: List[str], batch_size: int) -> Iterable[List[str]]:
+    for i in range(0, len(items), batch_size):
+        yield items[i : i + batch_size]
+
+
+def _l2_normalize(vectors: np.ndarray) -> np.ndarray:
+    norms = np.linalg.norm(vectors, axis=1, keepdims=True)
+    norms = np.where(norms == 0.0, 1.0, norms)
+    return vectors / norms
+
+
+class BaseEmbeddingProvider(ABC):
+    model_name: str
+    model_type: str
+    dimension: int
+    supports_query_prompt: bool = False
+
+    @abstractmethod
+    def encode(self, texts: List[str], is_query: bool = False) -> np.ndarray:
+        raise NotImplementedError
+
+
+class LocalSentenceTransformerProvider(BaseEmbeddingProvider):
     """
-    Embedding model using SentenceTransformers (supports Qwen3 and other models)
+    Local embedding provider based on SentenceTransformers.
     """
-    def __init__(self, model_name: str = None, use_optimization: bool = True):
-        self.model_name = model_name or config.EMBEDDING_MODEL
+
+    def __init__(self, model_name: str, use_optimization: bool = True):
+        self.model_name = model_name
         self.use_optimization = use_optimization
-        
-        print(f"Loading embedding model: {self.model_name}")
-        
-        # Check if it's a Qwen3 model (through SentenceTransformers)
+
+        print(f"Loading local embedding model: {self.model_name}")
+
         if self.model_name.startswith("qwen3"):
             self._init_qwen3_sentence_transformer()
         else:
             self._init_standard_sentence_transformer()
 
     def _init_qwen3_sentence_transformer(self):
-        """Initialize Qwen3 model using SentenceTransformers"""
         try:
             from sentence_transformers import SentenceTransformer
-            
-            # Map model names to actual model paths
+
             qwen3_models = {
                 "qwen3-0.6b": "Qwen/Qwen3-Embedding-0.6B",
-                "qwen3-4b": "Qwen/Qwen3-Embedding-4B", 
-                "qwen3-8b": "Qwen/Qwen3-Embedding-8B"
+                "qwen3-4b": "Qwen/Qwen3-Embedding-4B",
+                "qwen3-8b": "Qwen/Qwen3-Embedding-8B",
             }
-            
+
             model_path = qwen3_models.get(self.model_name, self.model_name)
             print(f"Loading Qwen3 model via SentenceTransformers: {model_path}")
-            
-            # Initialize with optimization settings
+
             if self.use_optimization:
                 try:
-                    # Try to use flash_attention_2 and left padding for better performance
                     self.model = SentenceTransformer(
                         model_path,
                         model_kwargs={
-                            "attn_implementation": "flash_attention_2", 
-                            "device_map": "auto"
+                            "attn_implementation": "flash_attention_2",
+                            "device_map": "auto",
                         },
                         tokenizer_kwargs={"padding_side": "left"},
-                        trust_remote_code=True
+                        trust_remote_code=True,
                     )
                     print("Qwen3 loaded with flash_attention_2 optimization")
-                except Exception as e:
-                    print(f"Flash attention failed ({e}), using standard loading...")
+                except Exception as exc:
+                    print(f"Flash attention optimization failed ({exc}), using standard loading")
                     self.model = SentenceTransformer(model_path, trust_remote_code=True)
             else:
                 self.model = SentenceTransformer(model_path, trust_remote_code=True)
-            
+
             self.dimension = self.model.get_sentence_embedding_dimension()
             self.model_type = "qwen3_sentence_transformer"
-            
-            # Check if Qwen3 supports query prompts
-            self.supports_query_prompt = hasattr(self.model, 'prompts') and 'query' in getattr(self.model, 'prompts', {})
-            
+            self.supports_query_prompt = hasattr(self.model, "prompts") and "query" in getattr(self.model, "prompts", {})
+
             print(f"Qwen3 model loaded successfully with dimension: {self.dimension}")
             if self.supports_query_prompt:
                 print("Query prompt support detected")
-                
-        except Exception as e:
-            print(f"Failed to load Qwen3 model: {e}")
-            print("Falling back to default SentenceTransformers model...")
+
+        except Exception as exc:
+            print(f"Failed to load Qwen3 model: {exc}")
+            print("Falling back to default SentenceTransformers model")
             self._fallback_to_sentence_transformer()
 
     def _init_standard_sentence_transformer(self):
-        """Initialize standard SentenceTransformer model"""
         try:
             from sentence_transformers import SentenceTransformer
+
             self.model = SentenceTransformer(self.model_name)
             self.dimension = self.model.get_sentence_embedding_dimension()
             self.model_type = "sentence_transformer"
             self.supports_query_prompt = False
             print(f"SentenceTransformer model loaded with dimension: {self.dimension}")
-        except Exception as e:
-            print(f"Failed to load SentenceTransformer model: {e}")
+        except Exception as exc:
+            print(f"Failed to load SentenceTransformer model: {exc}")
             raise
 
     def _fallback_to_sentence_transformer(self):
-        """Fallback to default SentenceTransformer model"""
         fallback_model = "sentence-transformers/all-MiniLM-L6-v2"
         print(f"Using fallback model: {fallback_model}")
         self.model_name = fallback_model
         self._init_standard_sentence_transformer()
 
-    def encode(self, texts: List[str], is_query: bool = False) -> np.ndarray:
-        """
-        Encode list of texts to vectors
-        
-        Args:
-        - texts: List of texts to encode
-        - is_query: Whether these are query texts (for Qwen3 prompt optimization)
-        """
-        if isinstance(texts, str):
-            texts = [texts]
-        
-        # Use query prompt for Qwen3 models when encoding queries
-        if self.model_type == "qwen3_sentence_transformer" and self.supports_query_prompt and is_query:
-            return self._encode_with_query_prompt(texts)
-        else:
-            return self._encode_standard(texts)
-
-    def encode_single(self, text: str, is_query: bool = False) -> np.ndarray:
-        """
-        Encode single text
-        
-        Args:
-        - text: Text to encode
-        - is_query: Whether this is a query text (for Qwen3 prompt optimization)
-        """
-        return self.encode([text], is_query=is_query)[0]
-    
-    def encode_query(self, queries: List[str]) -> np.ndarray:
-        """
-        Encode queries with optimal settings for Qwen3
-        """
-        return self.encode(queries, is_query=True)
-    
-    def encode_documents(self, documents: List[str]) -> np.ndarray:
-        """
-        Encode documents (no query prompt)
-        """
-        return self.encode(documents, is_query=False)
-    
     def _encode_with_query_prompt(self, texts: List[str]) -> np.ndarray:
-        """Encode texts using Qwen3 query prompt"""
         try:
             embeddings = self.model.encode(
-                texts, 
-                prompt_name="query",  # Use Qwen3's query prompt
+                texts,
+                prompt_name="query",
                 show_progress_bar=False,
-                normalize_embeddings=True
+                normalize_embeddings=True,
             )
-            return embeddings
-        except Exception as e:
-            print(f"Query prompt encoding failed: {e}, falling back to standard encoding")
+            return np.asarray(embeddings, dtype=np.float32)
+        except Exception as exc:
+            print(f"Query prompt encoding failed: {exc}, falling back to standard encoding")
             return self._encode_standard(texts)
-    
+
     def _encode_standard(self, texts: List[str]) -> np.ndarray:
-        """Encode texts using standard method"""
         embeddings = self.model.encode(
-            texts, 
+            texts,
             show_progress_bar=False,
-            normalize_embeddings=True
+            normalize_embeddings=True,
         )
-        return embeddings
+        return np.asarray(embeddings, dtype=np.float32)
+
+    def encode(self, texts: List[str], is_query: bool = False) -> np.ndarray:
+        if self.model_type == "qwen3_sentence_transformer" and self.supports_query_prompt and is_query:
+            return self._encode_with_query_prompt(texts)
+        return self._encode_standard(texts)
+
+
+class OpenAICompatibleEmbeddingProvider(BaseEmbeddingProvider):
+    """
+    Embedding provider for OpenAI-compatible API endpoints.
+
+    Environment-oriented settings:
+    - EMBEDDING_API_KEY
+    - EMBEDDING_API_BASE
+    - EMBEDDING_MODEL
+    - EMBEDDING_DIMENSION
+    """
+
+    def __init__(
+        self,
+        model_name: str,
+        api_key: str,
+        api_base: Optional[str],
+        dimension: int,
+        batch_size: int = 64,
+        timeout: Optional[float] = None,
+    ):
+        if not api_key:
+            raise ValueError("EMBEDDING_API_KEY is required for API embedding backend")
+        if not model_name:
+            raise ValueError("EMBEDDING_MODEL is required for API embedding backend")
+        if not dimension or dimension <= 0:
+            raise ValueError(
+                "EMBEDDING_DIMENSION must be a positive integer for API embedding backend"
+            )
+
+        from openai import OpenAI
+
+        client_kwargs: Dict[str, Any] = {"api_key": api_key}
+        if api_base:
+            client_kwargs["base_url"] = api_base
+        if timeout is not None:
+            client_kwargs["timeout"] = timeout
+
+        self.client = OpenAI(**client_kwargs)
+        self.model_name = model_name
+        self.model_type = "openai_compatible_api"
+        self.dimension = int(dimension)
+        self.batch_size = max(1, int(batch_size))
+        self.supports_query_prompt = False
+
+        endpoint_msg = api_base if api_base else "default OpenAI endpoint"
+        print(
+            f"Using API embedding model: {self.model_name} (dim={self.dimension}, endpoint={endpoint_msg})"
+        )
+
+    def encode(self, texts: List[str], is_query: bool = False) -> np.ndarray:
+        del is_query  # Not used by API embeddings; kept for interface compatibility.
+
+        if not texts:
+            return np.empty((0, self.dimension), dtype=np.float32)
+
+        vectors: List[List[float]] = []
+        for batch in _batched(texts, self.batch_size):
+            response = self.client.embeddings.create(
+                model=self.model_name,
+                input=batch,
+            )
+            vectors.extend(item.embedding for item in response.data)
+
+        matrix = np.asarray(vectors, dtype=np.float32)
+        if matrix.ndim == 1:
+            matrix = matrix.reshape(1, -1)
+
+        if matrix.shape[1] != self.dimension:
+            raise ValueError(
+                f"Embedding dimension mismatch: expected {self.dimension}, got {matrix.shape[1]}"
+            )
+
+        return _l2_normalize(matrix)
+
+
+class EmbeddingModel:
+    """
+    Unified embedding facade with local and API providers.
+    """
+
+    def __init__(
+        self,
+        model_name: Optional[str] = None,
+        use_optimization: bool = True,
+        provider: Optional[str] = None,
+        dimension: Optional[int] = None,
+    ):
+        backend = (
+            provider
+            or os.getenv("EMBEDDING_BACKEND")
+            or os.getenv("EMBEDDING_PROVIDER")
+            or getattr(config, "EMBEDDING_BACKEND", None)
+            or getattr(config, "EMBEDDING_PROVIDER", "local")
+        )
+        backend = str(backend).strip().lower()
+
+        resolved_model_name = (
+            model_name
+            or os.getenv("EMBEDDING_MODEL")
+            or getattr(config, "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+        )
+
+        resolved_dimension = (
+            dimension
+            or _safe_int(os.getenv("EMBEDDING_DIMENSION"))
+            or getattr(config, "EMBEDDING_DIMENSION", None)
+        )
+
+        if backend in {"api", "openai", "openai_compatible"}:
+            api_key = (
+                os.getenv("EMBEDDING_API_KEY")
+                or getattr(config, "EMBEDDING_API_KEY", None)
+                or getattr(config, "OPENAI_API_KEY", None)
+            )
+            api_base = os.getenv("EMBEDDING_API_BASE") or getattr(config, "EMBEDDING_API_BASE", None)
+            api_batch_size = (
+                _safe_int(os.getenv("EMBEDDING_API_BATCH_SIZE"))
+                or getattr(config, "EMBEDDING_API_BATCH_SIZE", 64)
+            )
+            api_timeout = (
+                _safe_float(os.getenv("EMBEDDING_API_TIMEOUT"))
+                or getattr(config, "EMBEDDING_API_TIMEOUT", None)
+            )
+
+            self._provider = OpenAICompatibleEmbeddingProvider(
+                model_name=resolved_model_name,
+                api_key=api_key,
+                api_base=api_base,
+                dimension=resolved_dimension,
+                batch_size=api_batch_size,
+                timeout=api_timeout,
+            )
+        else:
+            self._provider = LocalSentenceTransformerProvider(
+                model_name=resolved_model_name,
+                use_optimization=use_optimization,
+            )
+
+        self.model_name = self._provider.model_name
+        self.model_type = self._provider.model_type
+        self.dimension = self._provider.dimension
+        self.supports_query_prompt = getattr(self._provider, "supports_query_prompt", False)
+
+    def encode(self, texts: List[str], is_query: bool = False) -> np.ndarray:
+        if isinstance(texts, str):
+            texts = [texts]
+        return self._provider.encode(texts, is_query=is_query)
+
+    def encode_single(self, text: str, is_query: bool = False) -> np.ndarray:
+        return self.encode([text], is_query=is_query)[0]
+
+    def encode_query(self, queries: List[str]) -> np.ndarray:
+        return self.encode(queries, is_query=True)
+
+    def encode_documents(self, documents: List[str]) -> np.ndarray:
+        return self.encode(documents, is_query=False)
