@@ -11,7 +11,7 @@ from typing import List, Optional
 from models.memory_entry import MemoryEntry, Dialogue
 from utils.llm_client import LLMClient
 from database.vector_store import VectorStore
-import config
+from utils.config_loader import config
 import json
 import asyncio
 import concurrent.futures
@@ -54,6 +54,14 @@ class MemoryBuilder:
 
         # Previous window entries (for context)
         self.previous_entries: List[MemoryEntry] = []
+
+    def reset_state(self):
+        """
+        Reset in-memory runtime state for a fresh session.
+        """
+        self.dialogue_buffer = []
+        self.processed_count = 0
+        self.previous_entries = []
 
     def add_dialogue(self, dialogue: Dialogue, auto_process: bool = True):
         """
@@ -150,7 +158,8 @@ class MemoryBuilder:
         if entries:
             self.vector_store.add_entries(entries)
             self.previous_entries = entries  # Save as context
-            self.processed_count += len(window)
+
+        self.processed_count += len(window)
 
         print(f"Generated {len(entries)} memory entries")
 
@@ -160,10 +169,12 @@ class MemoryBuilder:
         """
         if self.dialogue_buffer:
             print(f"\nProcessing remaining dialogues: {len(self.dialogue_buffer)} (fallback mode)")
-            entries = self._generate_memory_entries(self.dialogue_buffer)
+            current_buffer = list(self.dialogue_buffer)
+            entries = self._generate_memory_entries(current_buffer)
             if entries:
                 self.vector_store.add_entries(entries)
-                self.processed_count += len(self.dialogue_buffer)
+                self.previous_entries = entries
+            self.processed_count += len(current_buffer)
             self.dialogue_buffer = []
             print(f"Generated {len(entries)} memory entries")
 
@@ -364,11 +375,12 @@ Now process the above dialogues. Return ONLY the JSON array, no other explanatio
         if all_entries:
             print(f"\n[Parallel Processing] Storing {len(all_entries)} entries to database...")
             self.vector_store.add_entries(all_entries)
-            self.processed_count += sum(len(window) for window in windows)
             
             # Update previous entries (use last window's entries for context)
             if all_entries:
                 self.previous_entries = all_entries[-10:]  # Keep last 10 entries for context
+
+        self.processed_count += sum(len(window) for window in windows)
         
         print(f"[Parallel Processing] Completed processing {len(windows)} windows")
     

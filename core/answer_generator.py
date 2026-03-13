@@ -6,9 +6,9 @@ Generates answers from the merged context C_q after multi-view retrieval
 """
 from typing import List
 
-import config
 from models.memory_entry import MemoryEntry
 from utils.llm_client import LLMClient
+from utils.config_loader import config
 
 
 class AnswerGenerator:

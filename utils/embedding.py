@@ -13,7 +13,7 @@ from typing import Any, Dict, Iterable, List, Optional
 
 import numpy as np
 
-import config
+from utils.config_loader import config
 
 
 def _safe_int(value: Optional[str]) -> Optional[int]:
@@ -38,6 +38,43 @@ def _safe_float(value: Optional[str]) -> Optional[float]:
         return float(value)
     except ValueError:
         return None
+
+
+def _safe_str(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text if text else None
+
+
+def _resolve_embedding_api_key() -> Optional[str]:
+    return (
+        _safe_str(os.getenv("EMBEDDING_API_KEY"))
+        or _safe_str(os.getenv("DASHSCOPE_API_KEY"))
+        or _safe_str(getattr(config, "EMBEDDING_API_KEY", None))
+        or _safe_str(getattr(config, "DASHSCOPE_API_KEY", None))
+        or _safe_str(os.getenv("OPENAI_API_KEY"))
+        or _safe_str(getattr(config, "OPENAI_API_KEY", None))
+    )
+
+
+def _resolve_embedding_api_base() -> Optional[str]:
+    return (
+        _safe_str(os.getenv("EMBEDDING_API_BASE"))
+        or _safe_str(getattr(config, "EMBEDDING_API_BASE", None))
+        or _safe_str(os.getenv("OPENAI_BASE_URL"))
+        or _safe_str(getattr(config, "OPENAI_BASE_URL", None))
+    )
+
+
+def _is_dashscope_endpoint(api_base: Optional[str]) -> bool:
+    return bool(api_base and "dashscope.aliyuncs.com" in api_base.lower())
+
+
+def _is_dashscope_text_embedding_v4(model_name: str, api_base: Optional[str]) -> bool:
+    if not model_name:
+        return False
+    return _is_dashscope_endpoint(api_base) and model_name.strip().lower().startswith("text-embedding-v4")
 
 
 def _batched(items: List[str], batch_size: int) -> Iterable[List[str]]:
@@ -177,6 +214,10 @@ class OpenAICompatibleEmbeddingProvider(BaseEmbeddingProvider):
     - EMBEDDING_API_BASE
     - EMBEDDING_MODEL
     - EMBEDDING_DIMENSION
+
+    Notes:
+    - Query-specific SDK features (for example DashScope native `text_type="query"`
+      or `instruct`) are not available in this OpenAI-compatible path.
     """
 
     def __init__(
@@ -189,12 +230,14 @@ class OpenAICompatibleEmbeddingProvider(BaseEmbeddingProvider):
         timeout: Optional[float] = None,
     ):
         if not api_key:
-            raise ValueError("EMBEDDING_API_KEY is required for API embedding backend")
-        if not model_name:
-            raise ValueError("EMBEDDING_MODEL is required for API embedding backend")
-        if not dimension or dimension <= 0:
             raise ValueError(
-                "EMBEDDING_DIMENSION must be a positive integer for API embedding backend"
+                "Missing embedding API key. Set EMBEDDING_API_KEY (or DASHSCOPE_API_KEY)."
+            )
+        if not model_name:
+            raise ValueError("Missing embedding model. Set EMBEDDING_MODEL.")
+        if not dimension or int(dimension) <= 0:
+            raise ValueError(
+                "Missing/invalid embedding dimension. Set EMBEDDING_DIMENSION to a positive integer."
             )
 
         from openai import OpenAI
@@ -209,16 +252,24 @@ class OpenAICompatibleEmbeddingProvider(BaseEmbeddingProvider):
         self.model_name = model_name
         self.model_type = "openai_compatible_api"
         self.dimension = int(dimension)
-        self.batch_size = max(1, int(batch_size))
+
+        requested_batch_size = max(1, int(batch_size))
+        if _is_dashscope_text_embedding_v4(self.model_name, api_base) and requested_batch_size > 10:
+            print(
+                "Capping embedding batch size to 10 for DashScope text-embedding-v4 compatibility."
+            )
+            requested_batch_size = 10
+        self.batch_size = requested_batch_size
         self.supports_query_prompt = False
 
         endpoint_msg = api_base if api_base else "default OpenAI endpoint"
         print(
-            f"Using API embedding model: {self.model_name} (dim={self.dimension}, endpoint={endpoint_msg})"
+            f"Using API embedding model: {self.model_name} "
+            f"(dim={self.dimension}, batch={self.batch_size}, endpoint={endpoint_msg})"
         )
 
     def encode(self, texts: List[str], is_query: bool = False) -> np.ndarray:
-        del is_query  # Not used by API embeddings; kept for interface compatibility.
+        del is_query  # Interface compatibility only. No query-only API parameters are injected.
 
         if not texts:
             return np.empty((0, self.dimension), dtype=np.float32)
@@ -228,6 +279,7 @@ class OpenAICompatibleEmbeddingProvider(BaseEmbeddingProvider):
             response = self.client.embeddings.create(
                 model=self.model_name,
                 input=batch,
+                dimensions=self.dimension,
             )
             vectors.extend(item.embedding for item in response.data)
 
@@ -237,7 +289,8 @@ class OpenAICompatibleEmbeddingProvider(BaseEmbeddingProvider):
 
         if matrix.shape[1] != self.dimension:
             raise ValueError(
-                f"Embedding dimension mismatch: expected {self.dimension}, got {matrix.shape[1]}"
+                f"Embedding dimension mismatch: expected {self.dimension}, "
+                f"got {matrix.shape[1]} from model '{self.model_name}'."
             )
 
         return _l2_normalize(matrix)
@@ -273,30 +326,41 @@ class EmbeddingModel:
         resolved_dimension = (
             dimension
             or _safe_int(os.getenv("EMBEDDING_DIMENSION"))
-            or getattr(config, "EMBEDDING_DIMENSION", None)
+            or _safe_int(getattr(config, "EMBEDDING_DIMENSION", None))
         )
 
         if backend in {"api", "openai", "openai_compatible"}:
-            api_key = (
-                os.getenv("EMBEDDING_API_KEY")
-                or getattr(config, "EMBEDDING_API_KEY", None)
-                or getattr(config, "OPENAI_API_KEY", None)
-            )
-            api_base = os.getenv("EMBEDDING_API_BASE") or getattr(config, "EMBEDDING_API_BASE", None)
+            api_key = _resolve_embedding_api_key()
+            api_base = _resolve_embedding_api_base()
             api_batch_size = (
                 _safe_int(os.getenv("EMBEDDING_API_BATCH_SIZE"))
-                or getattr(config, "EMBEDDING_API_BATCH_SIZE", 64)
+                or _safe_int(getattr(config, "EMBEDDING_API_BATCH_SIZE", None))
+                or 64
             )
             api_timeout = (
                 _safe_float(os.getenv("EMBEDDING_API_TIMEOUT"))
-                or getattr(config, "EMBEDDING_API_TIMEOUT", None)
+                or _safe_float(getattr(config, "EMBEDDING_API_TIMEOUT", None))
             )
+
+            if not api_key:
+                raise ValueError(
+                    "Embedding backend is 'api' but no API key was found. "
+                    "Set EMBEDDING_API_KEY (or DASHSCOPE_API_KEY)."
+                )
+            if not resolved_model_name:
+                raise ValueError(
+                    "Embedding backend is 'api' but EMBEDDING_MODEL is missing."
+                )
+            if not resolved_dimension or int(resolved_dimension) <= 0:
+                raise ValueError(
+                    "Embedding backend is 'api' but EMBEDDING_DIMENSION is missing or invalid."
+                )
 
             self._provider = OpenAICompatibleEmbeddingProvider(
                 model_name=resolved_model_name,
                 api_key=api_key,
                 api_base=api_base,
-                dimension=resolved_dimension,
+                dimension=int(resolved_dimension),
                 batch_size=api_batch_size,
                 timeout=api_timeout,
             )

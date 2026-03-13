@@ -63,19 +63,21 @@ Adapter file: `benchmarks/longhealthmem_adapter.py`
 LongHealthMem has one information source (the patient record text stream), so each patient's texts are converted into synthetic user-only dialogue turns.
 
 - Texts are processed in deterministic order (`text_0`, `text_1`, ...).
-- Each text is split by fixed character chunks if needed.
-- Each chunk becomes one `Dialogue` with the configured speaker (default: `patient`).
+- Default behavior is **one input text = one user turn**.
+- Optional fallback chunking is used only when `LONGHEALTHMEM_CHUNK_SIZE > 0` (or `--chunk-size > 0`) and a single text exceeds that limit.
+- Each turn is ingested incrementally, and memory is updated after each turn.
+- Runtime state is reset between patients so memory never leaks across patient sessions.
 
 Config options (`config.py`):
 
-- `LONGHEALTHMEM_CHUNK_SIZE`
-- `LONGHEALTHMEM_CHUNK_OVERLAP`
+- `LONGHEALTHMEM_CHUNK_SIZE` (default `0`, disabled)
+- `LONGHEALTHMEM_CHUNK_OVERLAP` (default `0`)
 - `LONGHEALTHMEM_USER_SPEAKER`
 
-CLI overrides:
+CLI overrides (fallback chunking example):
 
 ```python
-python test_benchmark.py --benchmark longhealthmem --chunk-size 2000 --chunk-overlap 200
+python test_benchmark.py --benchmark longhealthmem --chunk-size 12000 --chunk-overlap 200
 ```
 
 ## 4) MCQ Prompting and Parsing
@@ -122,12 +124,18 @@ Implementation: `benchmarks/longhealthmem_tester.py`
 
 ### Required API vars/settings
 
-- `EMBEDDING_API_KEY`
+- `EMBEDDING_API_KEY` (or `DASHSCOPE_API_KEY` as fallback)
 - `EMBEDDING_API_BASE`
 - `EMBEDDING_MODEL`
 - `EMBEDDING_DIMENSION`
 
 These can be set in `config.py` or environment variables. Environment variables take precedence.
+
+Implementation notes:
+
+- OpenAI-compatible requests use `dimensions=<int>` when sending embedding requests.
+- For DashScope-compatible `text-embedding-v4`, per-request batch size is capped to 10 inputs.
+- Query-specific native SDK parameters (for example `text_type="query"`) are not faked in the OpenAI-compatible path.
 
 Example (OpenAI-compatible Qwen endpoint):
 
@@ -144,3 +152,4 @@ EMBEDDING_DIMENSION = 1024
 - LoCoMo legacy script (`test_locomo10.py`) remains unchanged for backward compatibility.
 - Unified benchmark entrypoint is `test_benchmark.py`.
 - No training/evaluation/install is run automatically by these code changes.
+

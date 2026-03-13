@@ -10,7 +10,6 @@ from database.vector_store import VectorStore
 from core.memory_builder import MemoryBuilder
 from core.hybrid_retriever import HybridRetriever
 from core.answer_generator import AnswerGenerator
-import config
 
 
 class SimpleMemSystem:
@@ -141,6 +140,17 @@ class SimpleMemSystem:
         Note: In parallel mode, remaining dialogues are already processed
         """
         self.memory_builder.process_remaining()
+
+    def reset_runtime_state(self, clear_vector_store: bool = True):
+        """
+        Reset runtime state so a new session can run without cross-session leakage.
+
+        Args:
+        - clear_vector_store: Whether to drop and recreate the memory table.
+        """
+        if clear_vector_store:
+            self.vector_store.clear()
+        self.memory_builder.reset_state()
 
     def ask(self, question: str) -> str:
         """

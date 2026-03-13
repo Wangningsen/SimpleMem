@@ -11,7 +11,7 @@ import lancedb
 import pyarrow as pa
 from models.memory_entry import MemoryEntry
 from utils.embedding import EmbeddingModel
-import config
+from utils.config_loader import config
 import os
 
 

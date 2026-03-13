@@ -49,10 +49,11 @@ EMBEDDING_CONTEXT_LENGTH = 32768  # Optional reference field for local models
 
 # API embedding backend settings (used when EMBEDDING_BACKEND="api")
 # Environment variables with same names are also supported:
+#   DASHSCOPE_API_KEY is also accepted as a fallback API key in API backend mode.
 #   EMBEDDING_API_KEY, EMBEDDING_API_BASE, EMBEDDING_MODEL, EMBEDDING_DIMENSION
 EMBEDDING_API_KEY = None
 EMBEDDING_API_BASE = None
-EMBEDDING_API_BATCH_SIZE = 64
+EMBEDDING_API_BATCH_SIZE = 64  # DashScope text-embedding-v4 requests are capped to <=10 in code
 EMBEDDING_API_TIMEOUT = 60
 
 
@@ -82,10 +83,10 @@ USE_JSON_FORMAT = False
 # Supported values: "locomo", "longhealthmem"
 BENCHMARK = "locomo"
 
-# LongHealthMem-specific pseudo-turn chunking configuration
-# Long patient documents are split by character count into sequential user-only turns.
-LONGHEALTHMEM_CHUNK_SIZE = 2000
-LONGHEALTHMEM_CHUNK_OVERLAP = 200
+# LongHealthMem turn ingestion defaults: one patient text = one user turn.
+# Optional fallback chunking can be enabled only when a single text is too long for your model.
+LONGHEALTHMEM_CHUNK_SIZE = 0
+LONGHEALTHMEM_CHUNK_OVERLAP = 0
 LONGHEALTHMEM_USER_SPEAKER = "patient"
 
 
@@ -174,3 +175,5 @@ JUDGE_TEMPERATURE = 0.3
 # 3. Use Qwen for judge (if available):
 #    JUDGE_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 #    JUDGE_MODEL = "qwen-plus-2025-09-11"
+
+

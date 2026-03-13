@@ -4,7 +4,7 @@ LLM Client - Handles all LLM interactions
 import json
 from typing import List, Dict, Any, Optional
 from openai import OpenAI
-import config
+from utils.config_loader import config
 
 
 class LLMClient:

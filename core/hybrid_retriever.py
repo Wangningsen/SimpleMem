@@ -10,7 +10,7 @@ from typing import List, Optional, Dict, Any
 from models.memory_entry import MemoryEntry
 from utils.llm_client import LLMClient
 from database.vector_store import VectorStore
-import config
+from utils.config_loader import config
 import re
 from datetime import datetime, timedelta
 import dateparser

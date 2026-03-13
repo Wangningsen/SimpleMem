@@ -9,9 +9,9 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-import config
 from benchmarks.longhealthmem_tester import LongHealthMemTester
 from main import SimpleMemSystem
+from utils.config_loader import config
 
 
 def _default_dataset(benchmark: str) -> str:
@@ -115,14 +115,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--chunk-size",
         type=int,
-        default=getattr(config, "LONGHEALTHMEM_CHUNK_SIZE", 2000),
-        help="(LongHealthMem) Character chunk size for patient text splitting",
+        default=getattr(config, "LONGHEALTHMEM_CHUNK_SIZE", 0),
+        help="(LongHealthMem) Optional fallback chunk size for very long single texts (0 disables chunking)",
     )
     parser.add_argument(
         "--chunk-overlap",
         type=int,
-        default=getattr(config, "LONGHEALTHMEM_CHUNK_OVERLAP", 200),
-        help="(LongHealthMem) Character overlap between chunks",
+        default=getattr(config, "LONGHEALTHMEM_CHUNK_OVERLAP", 0),
+        help="(LongHealthMem) Character overlap for fallback chunking (used only when --chunk-size > 0)",
     )
     parser.add_argument(
         "--user-speaker",
@@ -143,8 +143,13 @@ def main() -> None:
     if args.result_file is None:
         args.result_file = _default_result_file(args.benchmark)
 
-    if args.benchmark == "longhealthmem" and args.chunk_overlap >= args.chunk_size:
-        parser.error("--chunk-overlap must be smaller than --chunk-size")
+    if args.benchmark == "longhealthmem":
+        if args.chunk_size < 0:
+            parser.error("--chunk-size must be >= 0")
+        if args.chunk_overlap < 0:
+            parser.error("--chunk-overlap must be >= 0")
+        if args.chunk_size > 0 and args.chunk_overlap >= args.chunk_size:
+            parser.error("--chunk-overlap must be smaller than --chunk-size")
 
     dataset_path = Path(args.dataset)
     print("=" * 80)
@@ -162,4 +167,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 

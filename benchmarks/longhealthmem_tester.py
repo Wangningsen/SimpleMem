@@ -6,7 +6,7 @@ from __future__ import annotations
 import json
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from benchmarks.longhealthmem_adapter import (
     LongHealthPatientSample,
@@ -14,7 +14,9 @@ from benchmarks.longhealthmem_adapter import (
     load_longhealthmem_dataset,
 )
 from benchmarks.mcq import build_mcq_prompt, parse_mcq_choice
-from main import SimpleMemSystem
+
+if TYPE_CHECKING:
+    from main import SimpleMemSystem
 
 
 class LongHealthMemTester:
@@ -24,9 +26,9 @@ class LongHealthMemTester:
 
     def __init__(
         self,
-        system: SimpleMemSystem,
+        system: "SimpleMemSystem",
         dataset_path: str,
-        chunk_size: int,
+        chunk_size: Optional[int],
         chunk_overlap: int = 0,
         user_speaker: str = "patient",
     ):
@@ -48,6 +50,23 @@ class LongHealthMemTester:
             samples = samples[:limit]
             print(f"Limited to {limit} patients")
         return samples
+
+    def _reset_system_state(self):
+        """
+        Reset all patient-specific runtime state before evaluating a patient.
+        """
+        if hasattr(self.system, "reset_runtime_state"):
+            self.system.reset_runtime_state(clear_vector_store=True)
+            return
+
+        # Backward-compatible fallback for older SimpleMemSystem versions.
+        self.system.vector_store.clear()
+        if hasattr(self.system, "memory_builder") and hasattr(self.system.memory_builder, "reset_state"):
+            self.system.memory_builder.reset_state()
+        elif hasattr(self.system, "memory_builder"):
+            self.system.memory_builder.dialogue_buffer = []
+            self.system.memory_builder.processed_count = 0
+            self.system.memory_builder.previous_entries = []
 
     def _answer_mcq(self, question: str, options: Dict[str, str], context_str: str) -> str:
         prompt = build_mcq_prompt(question=question, options=options, context=context_str)
@@ -80,13 +99,19 @@ class LongHealthMemTester:
         )
 
         print(
-            f"\n[Patient {sample.patient_id}] Building memory from "
-            f"{len(sample.texts)} documents -> {len(dialogues)} pseudo-turns"
+            f"\n[Patient {sample.patient_id}] Incremental memory build from "
+            f"{len(sample.texts)} texts -> {len(dialogues)} turns"
         )
 
         build_start = time.time()
-        self.system.add_dialogues(dialogues)
-        self.system.finalize()
+        for dialogue in dialogues:
+            # Incremental ingestion: process memory immediately after each turn.
+            self.system.add_dialogue(
+                speaker=dialogue.speaker,
+                content=dialogue.content,
+                timestamp=dialogue.timestamp,
+            )
+            self.system.finalize()
         build_time = time.time() - build_start
         self.memory_build_times.append(build_time)
 
@@ -210,7 +235,7 @@ class LongHealthMemTester:
         all_results: List[dict] = []
 
         for sample in samples:
-            self.system.vector_store.clear()
+            self._reset_system_state()
             all_results.extend(self._test_patient(sample))
 
         summary = self._build_summary(all_results, num_patients=len(samples))
@@ -239,4 +264,3 @@ class LongHealthMemTester:
             print(f"Results saved to {output_path}")
 
         return all_results
-

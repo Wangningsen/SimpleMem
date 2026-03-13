@@ -214,22 +214,33 @@ def chunk_text_by_chars(text: str, chunk_size: int, overlap: int = 0) -> List[st
 
 def convert_patient_to_dialogues(
     patient: LongHealthPatientSample,
-    chunk_size: int,
+    chunk_size: Optional[int] = None,
     chunk_overlap: int = 0,
     speaker: str = "patient",
 ) -> List[Dialogue]:
     """
     Convert one patient's longitudinal documents into user-only dialogue turns.
+
+    Default behavior preserves one input text as one dialogue turn.
+    Optional character chunking is only applied as a fallback when `chunk_size > 0`
+    and a single text exceeds that size.
     """
     dialogues: List[Dialogue] = []
     dialogue_id = 1
 
     for text_item in patient.texts:
-        chunks = chunk_text_by_chars(
-            text=text_item.text,
-            chunk_size=chunk_size,
-            overlap=chunk_overlap,
-        )
+        text = text_item.text or ""
+        if not text:
+            continue
+
+        chunks = [text]
+        if chunk_size and chunk_size > 0 and len(text) > chunk_size:
+            chunks = chunk_text_by_chars(
+                text=text,
+                chunk_size=chunk_size,
+                overlap=chunk_overlap,
+            )
+
         for chunk in chunks:
             dialogues.append(
                 Dialogue(
@@ -242,4 +253,5 @@ def convert_patient_to_dialogues(
             dialogue_id += 1
 
     return dialogues
+
 

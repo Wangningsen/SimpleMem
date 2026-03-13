@@ -7,7 +7,10 @@ import re
 from typing import Dict, Iterable, Optional
 
 
-_FINAL_ANSWER_RE = re.compile(r"final\s*answer\s*[:\-]\s*\(?\s*([A-Z])\s*\)?", re.IGNORECASE)
+_ANSWER_RE = re.compile(
+    r"\b(?:final\s+)?answer(?:\s+is)?\s*[:\-]?\s*\(?\s*(?:option\s*)?([A-Z])\s*\)?",
+    re.IGNORECASE,
+)
 _OPTION_RE = re.compile(r"\boption\s*([A-Z])\b", re.IGNORECASE)
 _PAREN_RE = re.compile(r"\(([A-Z])\)")
 _STANDALONE_RE = re.compile(r"\b([A-Z])\b")
@@ -51,6 +54,7 @@ def parse_mcq_choice(raw_output: str, valid_labels: Iterable[str]) -> Optional[s
     - Option A
     - (A)
     - Final answer: A
+    - Final answer is Option A
     """
     if not raw_output:
         return None
@@ -66,7 +70,7 @@ def parse_mcq_choice(raw_output: str, valid_labels: Iterable[str]) -> Optional[s
     if len(text) == 1 and text.upper() in valid:
         return text.upper()
 
-    for regex in (_FINAL_ANSWER_RE, _OPTION_RE, _PAREN_RE):
+    for regex in (_ANSWER_RE, _OPTION_RE, _PAREN_RE):
         match = regex.search(text)
         if match:
             candidate = match.group(1).upper()

@@ -21,6 +21,7 @@ from sentence_transformers.util import pytorch_cos_sim
 
 from main import SimpleMemSystem
 from models.memory_entry import Dialogue
+from utils.config_loader import config
 
 # Download required NLTK data
 try:
@@ -334,7 +335,6 @@ def calculate_sentence_similarity(prediction: str, reference: str) -> float:
 def create_judge_llm_client():
     """Create a dedicated LLM client for judge evaluation"""
     from utils.llm_client import LLMClient
-    import config
     
     # Use judge-specific settings, fall back to main settings if not specified
     judge_api_key = getattr(config, 'JUDGE_API_KEY', None) or config.OPENAI_API_KEY
@@ -456,7 +456,6 @@ Return ONLY the JSON, no other text.
             }
         ]
         
-        import config
         # Use JSON format if configured
         response_format = None
         if hasattr(config, 'USE_JSON_FORMAT') and config.USE_JSON_FORMAT:
@@ -704,7 +703,6 @@ Return ONLY the JSON, no other text.
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                import config
                 # Use JSON format if configured
                 response_format = None
                 if hasattr(config, 'USE_JSON_FORMAT') and config.USE_JSON_FORMAT:
@@ -803,8 +801,6 @@ Return ONLY the JSON, no other text.
         
         # Use ThreadPoolExecutor for parallel question processing
         # Use explicit test_workers parameter, or config, or reasonable default
-        import config
-        
         if self.test_workers is not None:
             max_workers = self.test_workers
         else:
